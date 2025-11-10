@@ -14,6 +14,23 @@
 - Dockerfile with multi-stage build
 - Docker Compose for app + Postgres
 
+## Running Locally
+1. Start DB (Docker): `docker-compose up -d db`
+2. Setup:
+  - Install dependencies: `npm install`
+  - DB migration up:`npm run migrate:up:local`
+3. Start Dev server: `npm run dev` (exposes `3000`)
+- Build: `npm run build`
+- Tests: 
+  - Unit tests: `npm run test:unit` 
+  - Integration tests: `npm run test:integration` (need dev server started)
+
+## Docker running locally
+- Build service image: `npm run docker:build`
+- Start service with containers: `npm run docker:up` (exposes `3000`)
+- Stop service with containers: `npm run docker:down`
+- Containerized integration tests: `npm run docker:test`
+
 ## API
 - Base URL: `http://localhost:3000/api/v1`
 - Endpoints:
@@ -36,23 +53,6 @@
 
 ## Unit Tests
 - `src/__tests__/unit/health.test.ts` – health endpoint.
-
-## Running Locally
-1. Start DB (Docker): `docker-compose up -d db`
-2. Setup:
-  - Install dependencies: `npm install`
-  - DB migration up:`npm run migrate:up:local`
-3. Start Dev server: `npm run dev` (exposes `3000`)
-- Build: `npm run build`
-- Tests: 
-  - Unit tests: `npm run test:unit` 
-  - Integration tests: `npm run test:integration` (need dev server started)
-
-## Docker running locally
-- Build application image: `npm run docker:build`
-- Run containers: `npm run docker:up` (exposes `3000`)
-- Stop containers: `npm run docker:down`
-- Containerized tests: `npm run docker:test`
 
 ## Project Structure
 - `src/app.ts` – Koa app setup and middleware

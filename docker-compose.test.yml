@@ -1,0 +1,48 @@
+version: '3.9'
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: password_management_test
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d password_management_test"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  app:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: test
+      PORT: 3000
+      HOST: 0.0.0.0
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: password_management_test
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_SSL: "false"
+      DB_POOL_SIZE: 10
+      LOG_LEVEL: warn
+      DATABASE_URL: postgres://postgres:postgres@db:5432/password_management_test
+    command: sh -c "npm run migrate:up && node dist/index.js"
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"http=require('http');http.get('http://localhost:3000/api/v1/health',res=>{process.exit(res.statusCode===200?0:1)}).on('error',()=>process.exit(1))\""]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  app-test:
+    build: .
+    depends_on:
+      app:
+        condition: service_healthy
+    environment:
+      NODE_ENV: test
+      TEST_BASE_URL: http://app:3000
+    command: npm run test:docker:integration

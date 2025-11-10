@@ -1,0 +1,44 @@
+version: '3.9'
+services:
+  app:
+    build: .
+    depends_on:
+      - db
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      HOST: 0.0.0.0
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: password_management
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_SSL: "false"
+      DB_POOL_SIZE: 10
+      LOG_LEVEL: info
+      LOG_FILE: logs/app.log
+      DATABASE_URL: postgres://postgres:postgres@db:5432/password_management
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+    command: sh -c "npm run migrate:up && npm run build && node dist/index.js"
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: password_management
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d password_management"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:

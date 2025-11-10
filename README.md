@@ -17,8 +17,8 @@
 ## Running Locally
 1. Start DB (Docker): `docker-compose up -d db`
 2. Setup:
-  - Install dependencies: `npm install`
-  - DB migration up:`npm run migrate:up:local`
+    - Install dependencies: `npm install`
+    - DB migration up:`npm run migrate:up:local`
 3. Start Dev server: `npm run dev` (exposes `3000`)
 - Build: `npm run build`
 - Tests: 

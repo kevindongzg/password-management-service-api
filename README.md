@@ -31,11 +31,6 @@
 - Stop service with containers: `npm run docker:down`
 - Containerized integration tests: `npm run docker:test`
 
-## API
-- Base URL: `http://localhost:3000/api/v1`
-- Endpoints:
-  - `GET /health` – service health check
-
 ## Database Schema
 - Managed via migrations (`migrations/`). Use `npm run migrate:up` to apply.
 
@@ -70,4 +65,6 @@ Use `.env.local` for local development. The application will load env files in p
 Docker Compose sets environment variables via service configuration; `.env.local` is not required inside containers.
 
 ## API
-- Health check: `GET /api/v1/health`
+- Local Base URL: `http://localhost:3000/api/v1`
+- Endpoints:
+  - `GET /health` – service health check

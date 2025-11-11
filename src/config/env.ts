@@ -1,15 +1,14 @@
 import dotenv from 'dotenv';
 import fs from 'fs';
 
-export function loadEnv(): string | null {
+export function loadEnv(): void {
   const candidates = ['.env.local', '.env'];
   for (const file of candidates) {
     if (fs.existsSync(file)) {
       dotenv.config({ path: file });
-      return file;
+      return;
     }
   }
-  // Fallback: load defaults and process env
+  
   dotenv.config();
-  return null;
 }

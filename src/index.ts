@@ -3,8 +3,7 @@ import { createApp } from './app';
 import { logger } from './utils/logger';
 import { createDatabaseConnection } from './config/database';
 
-// Load env: prefer .env.local, then .env, else process env
-const loadedEnvFile = loadEnv();
+loadEnv();
 
 const PORT = parseInt(process.env.PORT || '3000', 10);
 const HOST = process.env.HOST || '0.0.0.0';

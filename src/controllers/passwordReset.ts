@@ -1,7 +1,7 @@
 import { controller, post } from '../framework/decorator';
 import type { Context } from 'koa';
-import { initiatePasswordReset } from '../services/passwordResetService';
-import type { PasswordResetInitiateRequest, PasswordResetInitiateResponse } from '../types/passwordReset';
+import { initiatePasswordReset, executePasswordReset } from '../services/passwordResetService';
+import type { PasswordResetInitiateRequest, PasswordResetInitiateResponse, PasswordResetExecuteRequest, PasswordResetExecuteResponse } from '../types/passwordReset';
 
 @controller('/password-reset')
 export class PasswordResetController {
@@ -10,6 +10,17 @@ export class PasswordResetController {
     const body = (ctx.request.body ?? {}) as Partial<PasswordResetInitiateRequest>;
     const email: string = body.email ?? '';
     const result: PasswordResetInitiateResponse = await initiatePasswordReset(email);
+    ctx.status = 200;
+    ctx.body = result;
+  }
+
+  @post('/execute')
+  async execute(ctx: Context): Promise<void> {
+    const body = (ctx.request.body ?? {}) as Partial<PasswordResetExecuteRequest>;
+    const email: string = body.email ?? '';
+    const code: string = body.code ?? '';
+    const newPassword: string = body.newPassword ?? '';
+    const result: PasswordResetExecuteResponse = await executePasswordReset(email, code, newPassword);
     ctx.status = 200;
     ctx.body = result;
   }

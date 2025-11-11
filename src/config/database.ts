@@ -4,11 +4,11 @@ import { logger } from '../utils/logger';
 let pool: Pool | null = null;
 
 export const databaseConfig: PoolConfig = {
-  host: process.env.DB_HOST || 'localhost',
+  host: process.env.DB_HOST,
   port: parseInt(process.env.DB_PORT || '5432', 10),
-  database: process.env.DB_NAME || 'password_management',
-  user: process.env.DB_USER || 'postgres',
-  password: process.env.DB_PASSWORD || 'postgres',
+  database: process.env.DB_NAME,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
   ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
   max: parseInt(process.env.DB_POOL_SIZE || '10', 10),
   idleTimeoutMillis: 30000,

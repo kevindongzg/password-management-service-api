@@ -19,17 +19,20 @@
 2. Setup:
     - Install dependencies: `npm install`
     - DB migration up:`npm run migrate:up:local`
-3. Start Dev server: `npm run dev` (exposes `3000`)
-- Build: `npm run build`
-- Tests: 
-  - Unit tests: `npm run test:unit` 
-  - Integration tests: `npm run test:integration` (need dev server started)
+3. Start service with dev: `npm run dev` (exposes `3000`)
+
+Build: `npm run build`
 
 ## Docker running locally
 - Build service image: `npm run docker:build`
 - Start service with containers: `npm run docker:up` (exposes `3000`)
 - Stop service with containers: `npm run docker:down`
-- Containerized integration tests: `npm run docker:test`
+
+## Tests
+- Unit tests: `npm run test:unit`
+- Integration tests:
+  - Local env integration tests: `npm run test:integration` (need service started with dev or containers)
+  - Containerized integration tests: `npm run docker:test`
 
 ## Database Schema
 - Managed via migrations (`migrations/`). Use `npm run migrate:up` to apply.
@@ -45,9 +48,6 @@
 ## Logging
 - Structured logging with `winston`.
 - Logs include: request method, URL, status, duration, and for reset endpoints minimal identifiers (email) without sensitive content.
-
-## Unit Tests
-- `src/__tests__/unit/health.test.ts` – health endpoint.
 
 ## Project Structure
 - `src/app.ts` – Koa app setup and middleware

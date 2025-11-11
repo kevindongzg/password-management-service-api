@@ -55,10 +55,11 @@ Build: `npm run build`
 - Logs include: request method, URL, status, duration, and for reset endpoints minimal identifiers (email) without sensitive content.
 
 ## Project Structure
-- `src/app.ts` – Koa app setup and middleware
+- `src/app.ts` – Koa app setup, middleware, and decorator route init (`Route`)
+- `src/framework/decorator.ts` – decorators (`@controller`, `@get`...) and auto-scan
+- `src/controllers/health.ts` – health controller using decorators
 - `src/index.ts` – server bootstrap and DB initialization
 - `src/config/database.ts` – PostgreSQL pool configuration
-- `src/routes/index.ts` – API routes (health endpoint)
 - `src/__tests__/unit/health.test.ts` – unit test for health endpoint
 - `src/__tests__/integration/health.http.e2e.test.ts` – E2E test hitting real app
 - `Dockerfile` – production image build

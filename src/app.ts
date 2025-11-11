@@ -3,7 +3,8 @@ import bodyParser from 'koa-bodyparser';
 import cors from '@koa/cors';
 import helmet from 'koa-helmet';
 import compress from 'koa-compress';
-import router from './routes';
+import { Route } from './framework/decorator';
+import { resolve } from 'path';
 import { errorHandler } from './middleware/errorHandler';
 
 export function createApp() {
@@ -15,8 +16,8 @@ export function createApp() {
   app.use(errorHandler);
 
   // Routes
-  app.use(router.routes());
-  app.use(router.allowedMethods());
+  const route = new Route(app, resolve(__dirname, 'controllers'), '/api/v1');
+  route.init();
 
   // 404 fallback
   app.use(async (ctx) => {

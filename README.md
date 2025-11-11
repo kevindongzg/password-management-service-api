@@ -15,11 +15,10 @@
 - Docker Compose for app + Postgres
 
 ## Running Locally
-1. Start DB (Docker): `docker-compose up -d db`
-2. Setup:
-    - Install dependencies: `npm install`
-    - DB migration up:`npm run migrate:up:local`
-3. Start service with local: `npm run local` (exposes `3000`)
+1. Install dependencies: `npm install`
+2. Start DB (Docker): `docker-compose up -d db`
+3. DB migration up:`npm run migrate:up:local`
+4. Start service with local: `npm run local` (exposes `3000`)
 
 Build: `npm run build`
 
@@ -31,11 +30,17 @@ Build: `npm run build`
 ## Tests
 - Unit tests: `npm run test:unit`
 - Integration tests:
-  - Local env integration tests: `npm run test:integration` (need service started with local or containers)
+  - Local env integration tests: `npm run test:integration` (__need service started with local or containers__)
   - Containerized integration tests: `npm run docker:test`
 
+## DB migration
+- DB migration create: `npm run migrate:create <name>`
+- Update DB schema in created migration scripts.
+- DB migration up: `npm run migrate:up:local`
+- DB migration down: `npm run migrate:down:local`
+
 ## Database Schema
-- Managed via migrations (`migrations/`). Use `npm run migrate:up` to apply.
+- Managed via migrations (`migrations/`).
 
 ## Security
 - Basic hardening via `helmet`, CORS, and input parsing.

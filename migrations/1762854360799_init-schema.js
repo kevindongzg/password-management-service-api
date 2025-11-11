@@ -1,6 +1,14 @@
-export const shorthands = undefined;
+/**
+ * @type {import('node-pg-migrate').ColumnDefinitions | undefined}
+ */
+exports.shorthands = undefined;
 
-export async function up(pgm) {
+/**
+ * @param pgm {import('node-pg-migrate').MigrationBuilder}
+ * @param run {() => void | undefined}
+ * @returns {Promise<void> | void}
+ */
+exports.up = (pgm) => {
   pgm.createTable('users', {
     id: { type: 'text', primaryKey: true },
     email: { type: 'text', notNull: true, unique: true },
@@ -32,11 +40,16 @@ export async function up(pgm) {
       onDelete: 'cascade',
     },
   });
-}
+};
 
-export async function down(pgm) {
+/**
+ * @param pgm {import('node-pg-migrate').MigrationBuilder}
+ * @param run {() => void | undefined}
+ * @returns {Promise<void> | void}
+ */
+exports.down = (pgm) => {
   pgm.dropConstraint('password_reset_requests', 'fk_password_reset_user');
   pgm.dropTable('password_reset_requests');
   pgm.dropIndex('users', 'email');
   pgm.dropTable('users');
-}
+};

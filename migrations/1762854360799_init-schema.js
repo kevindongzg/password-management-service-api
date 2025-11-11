@@ -31,6 +31,8 @@ exports.up = (pgm) => {
 
   pgm.createIndex('password_reset_requests', ['user_id', 'expires_at']);
   pgm.createIndex('password_reset_requests', ['email', 'code']);
+  pgm.createIndex('password_reset_requests', ['email', 'expires_at']);
+  pgm.createIndex('password_reset_requests', 'email', { name: 'password_reset_requests_email_active_idx', where: 'used_at IS NULL' });
 
   // Add FK with ON DELETE CASCADE
   pgm.addConstraint('password_reset_requests', 'fk_password_reset_user', {

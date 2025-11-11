@@ -23,9 +23,9 @@
 Build: `npm run build`
 
 ## Docker Running Locally
-- Build service image: `npm run docker:build`
-- Start service with containers: `npm run docker:up` (exposes `3000`)
-- Stop service with containers: `npm run docker:down`
+- Build service image: `npm run docker:build` or `docker-compose build`
+- Start service with containers: `npm run docker:up` or `docker-compose up -d` (exposes `3000`)
+- Stop service with containers: `npm run docker:down` or `docker-compose down`
 
 ## Tests
 - Unit tests: `npm run test:unit`

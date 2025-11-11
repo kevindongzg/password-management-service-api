@@ -6,14 +6,14 @@ import { resolve } from 'path';
 
 const prefixRegistry = new WeakMap<object, string>();
 
-type HttpMethod = 'get' | 'post' | 'put' | 'del' | 'use' | 'all';
+type HttpMethod = 'get' | 'post' | 'put' | 'delete' | 'use' | 'all';
 
 interface RouteConf {
   method: HttpMethod;
   path: string;
 }
 
-type ControllerCtor = Function; // class constructor
+type ControllerCtor = Function;
 type Prototype = object;
 type ControllerMethod = (ctx: Context, next?: Next) => unknown;
 
@@ -33,7 +33,7 @@ export const controller = (path: string) => (target: ControllerCtor) => {
 };
 
 const router = (conf: RouteConf) =>
-  (target: Prototype, key: string, descriptor: PropertyDescriptor) => {
+  (target: Prototype, key: string) => {
     conf.path = normalizePath(conf.path);
     const method = (target as any)[key] as ControllerMethod;
     routerMap.set({ target, ...conf }, method);
@@ -42,7 +42,7 @@ const router = (conf: RouteConf) =>
 export const get = (path: string) => router({ method: 'get', path });
 export const post = (path: string) => router({ method: 'post', path });
 export const put = (path: string) => router({ method: 'put', path });
-export const del = (path: string) => router({ method: 'del', path });
+export const del = (path: string) => router({ method: 'delete', path });
 export const use = (path: string) => router({ method: 'use', path });
 export const all = (path: string) => router({ method: 'all', path });
 
@@ -60,13 +60,7 @@ export class Route {
   init(): void {
     routerMap.clear();
 
-    globSync(resolve(this.apiPath, `./**/*.{ts,js}`)).forEach((f: string) => {
-      try {
-        require(f);
-      } catch (e) {
-        // Swallow individual controller load errors to avoid blocking init; rely on app-level error handling
-      }
-    });
+    globSync(resolve(this.apiPath, `./**/*.{ts,js}`)).forEach((f: string) => require(f));
 
     for (const [conf, controller] of routerMap) {
       const controllers = toArray<Middleware>(controller as unknown as Middleware);

@@ -124,3 +124,20 @@ Docker Compose sets environment variables via service configuration; `.env.local
     ```
 
 Note: For this exercise, reset code is returned directly in the initiate response to simplify validation (real-world systems typically deliver via email or SMS).
+
+## Postman Collection
+- Import the collection file:
+  - `postman/password-reset.postman_collection.json`
+- Variables
+  - `baseUrl` (collection variable) defaults to `http://localhost:3000/api/v1`
+  - `code` and `resetId` are automatically captured from the initiate response for use in execute.
+- Usage
+  1. Run "Initiate Password Reset"; verify response; variables `code`/`resetId` will be set.
+  2. Run "Execute Password Reset"; it will use `{{code}}` from the collection variables and return success message.
+
+## VCS (Git)
+- This project includes a local Git repository. To submit publicly:
+  - Create a new repo on GitHub/GitLab.
+  - Add remote: `git remote add origin <repo_url>`
+  - Push: `git push -u origin main` (or the branch you use)
+  - Share the repository link.

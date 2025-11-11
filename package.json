@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
-    "dev": "dotenv -e .env.local -- ts-node-dev --respawn --transpile-only src/index.ts",
+    "local": "dotenv -e .env.local -- ts-node-dev --respawn --transpile-only src/index.ts",
     "test:unit": "jest -c jest.unit.config.js",
     "test:watch": "jest -c jest.unit.config.js --watch",
     "test:integration": "tsc && jest -c jest.integration.config.js",

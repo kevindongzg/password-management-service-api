@@ -19,11 +19,11 @@
 2. Setup:
     - Install dependencies: `npm install`
     - DB migration up:`npm run migrate:up:local`
-3. Start service with dev: `npm run dev` (exposes `3000`)
+3. Start service with local: `npm run local` (exposes `3000`)
 
 Build: `npm run build`
 
-## Docker running locally
+## Docker Running Locally
 - Build service image: `npm run docker:build`
 - Start service with containers: `npm run docker:up` (exposes `3000`)
 - Stop service with containers: `npm run docker:down`
@@ -31,7 +31,7 @@ Build: `npm run build`
 ## Tests
 - Unit tests: `npm run test:unit`
 - Integration tests:
-  - Local env integration tests: `npm run test:integration` (need service started with dev or containers)
+  - Local env integration tests: `npm run test:integration` (need service started with local or containers)
   - Containerized integration tests: `npm run docker:test`
 
 ## Database Schema

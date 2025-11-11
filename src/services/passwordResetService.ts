@@ -2,7 +2,7 @@ import { getDatabasePool } from '../config/database';
 import { logger } from '../utils/logger';
 import { v4 as uuidv4 } from 'uuid';
 import validator from 'validator';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import type { PasswordResetInitiateResponse, PasswordResetExecuteResponse } from '../types/passwordReset';
 
 const RESET_TTL_MINUTES = 30;

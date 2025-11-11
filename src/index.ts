@@ -18,7 +18,12 @@ async function start() {
       logger.info(`Server listening on http://${HOST}:${PORT}`);
     });
   } catch (err) {
-    logger.error('Failed to start server', { err });
+    const error = err as Error;
+    logger.error('Failed to start server', {
+      message: error?.message,
+      name: error?.name,
+      stack: error?.stack,
+    });
     process.exit(1);
   }
 }

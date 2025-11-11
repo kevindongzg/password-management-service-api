@@ -13,7 +13,7 @@ jest.mock('../../config/database', () => {
   };
 });
 
-jest.mock('bcrypt', () => ({
+jest.mock('bcryptjs', () => ({
   __esModule: true,
   default: {
     hash: jest.fn().mockResolvedValue('hashed-password'),

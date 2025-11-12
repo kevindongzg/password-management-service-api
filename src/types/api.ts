@@ -4,3 +4,8 @@ export type ApiErrorResponse = {
   timestamp: string;
   path: string;
 };
+
+export interface AppError extends Error {
+  status?: number;
+  details?: unknown;
+}

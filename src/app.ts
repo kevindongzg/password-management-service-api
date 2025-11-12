@@ -6,6 +6,7 @@ import compress from 'koa-compress';
 import { Route } from './framework/decorator';
 import { resolve } from 'path';
 import { errorHandler } from './middleware/errorHandler';
+import { accessLog } from './middleware/accessLog';
 
 export function createApp() {
   const app = new Koa();
@@ -13,6 +14,7 @@ export function createApp() {
   app.use(cors());
   app.use(compress());
   app.use(bodyParser());
+  app.use(accessLog);
   app.use(errorHandler);
 
   // Routes

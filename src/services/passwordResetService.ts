@@ -3,7 +3,7 @@ import { logger } from '../utils/logger';
 import { v4 as uuidv4 } from 'uuid';
 import validator from 'validator';
 import bcrypt from 'bcryptjs';
-import type { PasswordResetInitiateResponse, PasswordResetExecuteResponse } from '../types/passwordReset';
+import type { PasswordResetInitiateResponse, PasswordResetExecuteResponse } from '../types';
 
 const RESET_TTL_MINUTES = 30;
 const EMAIL_VALIDATION_OPTS = { allow_utf8_local_part: true, require_tld: true } as const;

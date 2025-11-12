@@ -1,7 +1,7 @@
 import { controller, post } from '../framework/decorator';
 import type { Context } from 'koa';
 import { initiatePasswordReset, executePasswordReset } from '../services/passwordResetService';
-import type { PasswordResetInitiateRequest, PasswordResetInitiateResponse, PasswordResetExecuteRequest, PasswordResetExecuteResponse } from '../types/passwordReset';
+import type { PasswordResetInitiateRequest, PasswordResetInitiateResponse, PasswordResetExecuteRequest, PasswordResetExecuteResponse } from '../types';
 
 @controller('/password-reset')
 export class PasswordResetController {

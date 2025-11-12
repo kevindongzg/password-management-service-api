@@ -60,7 +60,38 @@ Seed users (development/testing): a migration `migrations/*_seed-users.js` inser
 
 ## Logging
 - Structured logging with `winston`.
-- Logs include: request method, URL, status, duration, and for reset endpoints minimal identifiers (email) without sensitive content.
+- Access logs (http_access) include:
+  - `method`: HTTP method (GET/POST/...)
+  - `path`: Router path (e.g., `/api/v1/password-reset/initiate`)
+  - `status`: Response status code
+  - `duration_ms`: End-to-end processing time in milliseconds
+  - Example:
+    ```json
+    {
+      "message": "http_access",
+      "method": "POST",
+      "path": "/api/v1/password-reset/initiate",
+      "status": 200,
+      "duration_ms": 5,
+      "timestamp": "2025-11-11T10:00:00.000Z",
+      "service": "password-management-api"
+    }
+    ```
+- Error logs include:
+  - `status`, `message`, `method`, `url` and when available `name`, `stack`
+  - Example:
+    ```json
+    {
+      "level": "error",
+      "message": "Request error",
+      "status": 400,
+      "method": "POST",
+      "url": "/api/v1/password-reset/execute",
+      "timestamp": "2025-11-11T10:00:00.000Z",
+      "service": "password-management-api"
+    }
+    ```
+- Business logs for reset endpoints record minimal identifiers（`email`）
 
 ## Project Structure
 - `src/app.ts` – Koa app setup, middleware, and decorator route init (`Route`)
@@ -134,10 +165,3 @@ Note: For this exercise, reset code is returned directly in the initiate respons
 - Usage
   1. Run "Initiate Password Reset"; verify response; variables `code`/`resetId` will be set.
   2. Run "Execute Password Reset"; it will use `{{code}}` from the collection variables and return success message.
-
-## VCS (Git)
-- This project includes a local Git repository. To submit publicly:
-  - Create a new repo on GitHub/GitLab.
-  - Add remote: `git remote add origin <repo_url>`
-  - Push: `git push -u origin main` (or the branch you use)
-  - Share the repository link.

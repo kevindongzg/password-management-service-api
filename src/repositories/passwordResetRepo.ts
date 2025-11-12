@@ -1,17 +1,5 @@
 import { sql } from '../config/sql';
-
-export interface UserRow {
-  id: string;
-  email: string;
-}
-
-export interface ResetRequestRow {
-  id: string;
-  user_id: string;
-  email: string;
-  expires_at: string;
-  used_at: string | null;
-}
+import type { UserRow, ResetRequestRow } from '../types';
 
 export async function findUserByEmail(email: string): Promise<UserRow | null> {
   const rows = await sql<UserRow[]>`SELECT id, email FROM users WHERE email=${email}`;

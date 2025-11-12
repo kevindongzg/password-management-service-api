@@ -1,4 +1,4 @@
-import { sql } from '../config/sql';
+import { findUserByEmail, hasActiveReset, insertResetRequest, findResetRequest, executeResetTransaction } from '../repositories/passwordResetRepo';
 import { logger } from '../utils/logger';
 import { v4 as uuidv4 } from 'uuid';
 import validator from 'validator';
@@ -17,34 +17,28 @@ export async function initiatePasswordReset(email: string): Promise<PasswordRese
     err.status = 400;
     throw err;
   }
-
-  try {
-    const userRows = await sql`SELECT id, email FROM users WHERE email=${email}`;
-    if (userRows.length === 0) {
-      const err: any = new Error('User not found');
-      err.status = 404;
-      throw err;
-    }
-    const user = userRows[0];
-
-    const activeRows = await sql`SELECT id FROM password_reset_requests WHERE email=${email} AND used_at IS NULL AND expires_at > NOW()`;
-    if (activeRows.length > 0) {
-      const err: any = new Error('An active reset request already exists');
-      err.status = 429;
-      throw err;
-    }
-
-    const id = uuidv4();
-    const code = generateCode();
-    const expiresAt = new Date(Date.now() + RESET_TTL_MINUTES * 60 * 1000);
-
-    await sql`INSERT INTO password_reset_requests (id, user_id, email, code, expires_at) VALUES (${id}, ${user.id}, ${email}, ${code}, ${expiresAt.toISOString()})`;
-
-    logger.info('Password reset initiated', { email });
-    return { resetId: id, code, expiresAt: expiresAt.toISOString() };
-  } finally {
-    // no-op: sql client uses pooled connections internally
+  const user = await findUserByEmail(email);
+  if (!user) {
+    const err: any = new Error('User not found');
+    err.status = 404;
+    throw err;
   }
+
+  const active = await hasActiveReset(email);
+  if (active) {
+    const err: any = new Error('An active reset request already exists');
+    err.status = 429;
+    throw err;
+  }
+
+  const id = uuidv4();
+  const code = generateCode();
+  const expiresAt = new Date(Date.now() + RESET_TTL_MINUTES * 60 * 1000);
+
+  await insertResetRequest({ id, userId: user.id, email, code, expiresAtIso: expiresAt.toISOString() });
+
+  logger.info('Password reset initiated', { email });
+  return { resetId: id, code, expiresAt: expiresAt.toISOString() };
 }
 
 export async function executePasswordReset(
@@ -63,38 +57,28 @@ export async function executePasswordReset(
     throw err;
   }
 
-  try {
-    const reqRows = await sql`SELECT id, user_id, email, expires_at, used_at FROM password_reset_requests WHERE email=${email} AND code=${code}`;
-    if (reqRows.length === 0) {
-      const err: any = new Error('Reset request not found');
-      err.status = 404;
-      throw err;
-    }
-    const req = reqRows[0];
-    if (req.used_at) {
-      const err: any = new Error('Reset request already used');
-      err.status = 400;
-      throw err;
-    }
-    if (new Date(req.expires_at).getTime() < Date.now()) {
-      const err: any = new Error('Reset request expired');
-      err.status = 400;
-      throw err;
-    }
-
-    const rounds = parseInt(process.env.BCRYPT_ROUNDS || '12', 10);
-    const hash = await bcrypt.hash(newPassword, rounds);
-
-    await sql.begin(async (tx) => {
-      await tx`UPDATE users SET password_hash=${hash}, updated_at=NOW() WHERE id=${req.user_id}`;
-      await tx`UPDATE password_reset_requests SET used_at=NOW() WHERE id=${req.id}`;
-    });
-
-    logger.info('Password reset executed', { email });
-    return { message: 'Password updated successfully' };
-  } catch (e) {
-    throw e;
-  } finally {
-    // no-op
+  const req = await findResetRequest(email, code);
+  if (!req) {
+    const err: any = new Error('Reset request not found');
+    err.status = 404;
+    throw err;
   }
+  if (req.used_at) {
+    const err: any = new Error('Reset request already used');
+    err.status = 400;
+    throw err;
+  }
+  if (new Date(req.expires_at).getTime() < Date.now()) {
+    const err: any = new Error('Reset request expired');
+    err.status = 400;
+    throw err;
+  }
+
+  const rounds = parseInt(process.env.BCRYPT_ROUNDS || '12', 10);
+  const hash = await bcrypt.hash(newPassword, rounds);
+
+  await executeResetTransaction({ userId: req.user_id, hash, requestId: req.id });
+
+  logger.info('Password reset executed', { email });
+  return { message: 'Password updated successfully' };
 }

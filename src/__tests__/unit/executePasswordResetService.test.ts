@@ -7,21 +7,17 @@ jest.mock('bcryptjs', () => ({
   },
 }));
 
-jest.mock('../../config/sql', () => {
-  const sql: any = jest.fn();
-  sql.begin = jest.fn(async (cb: any) => {
-    const tx = jest.fn();
-    await cb(tx);
-  });
-  return { sql };
-});
+jest.mock('../../repositories/passwordResetRepo', () => ({
+  findResetRequest: jest.fn(),
+  executeResetTransaction: jest.fn(),
+}));
 
-const { sql } = jest.requireMock('../../config/sql');
+const repo = jest.requireMock('../../repositories/passwordResetRepo');
 
 describe('executePasswordReset', () => {
   beforeEach(() => {
-    sql.mockReset();
-    sql.begin.mockClear();
+    repo.findResetRequest.mockReset();
+    repo.executeResetTransaction.mockReset();
   });
 
   it('rejects invalid email', async () => {
@@ -35,29 +31,30 @@ describe('executePasswordReset', () => {
   });
 
   it('rejects when request not found', async () => {
-    sql.mockResolvedValueOnce([]);
+    repo.findResetRequest.mockResolvedValueOnce(null);
     await expect(executePasswordReset('user@example.com', '123456', 'NewPass123!'))
       .rejects.toMatchObject({ status: 404 });
   });
 
   it('rejects when request already used', async () => {
-    sql.mockResolvedValueOnce([{ id: 'r1', user_id: 'u1', used_at: new Date().toISOString(), expires_at: new Date(Date.now() + 60000).toISOString() }]);
+    repo.findResetRequest.mockResolvedValueOnce({ id: 'r1', user_id: 'u1', used_at: new Date().toISOString(), expires_at: new Date(Date.now() + 60000).toISOString(), email: 'user@example.com' });
     await expect(executePasswordReset('user@example.com', '123456', 'NewPass123!'))
       .rejects.toMatchObject({ status: 400 });
   });
 
   it('rejects when request expired', async () => {
-    sql.mockResolvedValueOnce([{ id: 'r1', user_id: 'u1', used_at: null, expires_at: new Date(Date.now() - 60000).toISOString() }]);
+    repo.findResetRequest.mockResolvedValueOnce({ id: 'r1', user_id: 'u1', used_at: null, expires_at: new Date(Date.now() - 60000).toISOString(), email: 'user@example.com' });
     await expect(executePasswordReset('user@example.com', '123456', 'NewPass123!'))
       .rejects.toMatchObject({ status: 400 });
   });
 
   it('updates password and marks request used on success', async () => {
     // select request
-    sql.mockResolvedValueOnce([{ id: 'r1', user_id: 'u1', used_at: null, expires_at: new Date(Date.now() + 60000).toISOString() }]);
+    repo.findResetRequest.mockResolvedValueOnce({ id: 'r1', user_id: 'u1', used_at: null, expires_at: new Date(Date.now() + 60000).toISOString(), email: 'user@example.com' });
+    repo.executeResetTransaction.mockResolvedValueOnce(undefined);
 
     const res = await executePasswordReset('user@example.com', '123456', 'NewPass123!');
     expect(res).toEqual({ message: 'Password updated successfully' });
-    expect(sql.begin).toHaveBeenCalledTimes(1);
+    expect(repo.executeResetTransaction).toHaveBeenCalledTimes(1);
   });
 });

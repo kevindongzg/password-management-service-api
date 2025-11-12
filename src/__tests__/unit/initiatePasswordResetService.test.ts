@@ -1,15 +1,18 @@
 import { initiatePasswordReset } from '../../services/passwordResetService';
 
-jest.mock('../../config/sql', () => {
-  const sql = jest.fn();
-  return { sql };
-});
+jest.mock('../../repositories/passwordResetRepo', () => ({
+  findUserByEmail: jest.fn(),
+  hasActiveReset: jest.fn(),
+  insertResetRequest: jest.fn(),
+}));
 
-const { sql } = jest.requireMock('../../config/sql');
+const repo = jest.requireMock('../../repositories/passwordResetRepo');
 
 describe('initiatePasswordReset', () => {
   beforeEach(() => {
-    sql.mockReset();
+    repo.findUserByEmail.mockReset();
+    repo.hasActiveReset.mockReset();
+    repo.insertResetRequest.mockReset();
   });
 
   it('rejects invalid email', async () => {
@@ -18,26 +21,24 @@ describe('initiatePasswordReset', () => {
   });
 
   it('rejects when user not found', async () => {
-    sql.mockResolvedValueOnce([]);
+    repo.findUserByEmail.mockResolvedValueOnce(null);
 
     await expect(initiatePasswordReset('user@example.com'))
       .rejects.toMatchObject({ status: 404 });
   });
 
   it('rejects when active request exists', async () => {
-    sql
-      .mockResolvedValueOnce([{ id: 'u1', email: 'user@example.com' }])
-      .mockResolvedValueOnce([{ id: 'r1' }]);
+    repo.findUserByEmail.mockResolvedValueOnce({ id: 'u1', email: 'user@example.com' });
+    repo.hasActiveReset.mockResolvedValueOnce(true);
 
     await expect(initiatePasswordReset('user@example.com'))
       .rejects.toMatchObject({ status: 429 });
   });
 
   it('creates reset request and returns code + expiresAt', async () => {
-    sql
-      .mockResolvedValueOnce([{ id: 'u1', email: 'user@example.com' }])
-      .mockResolvedValueOnce([])
-      .mockResolvedValueOnce({});
+    repo.findUserByEmail.mockResolvedValueOnce({ id: 'u1', email: 'user@example.com' });
+    repo.hasActiveReset.mockResolvedValueOnce(false);
+    repo.insertResetRequest.mockResolvedValueOnce(undefined);
 
     const res = await initiatePasswordReset('user@example.com');
     expect(res.resetId).toBeTruthy();

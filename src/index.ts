@@ -1,7 +1,7 @@
 import { loadEnv } from './config/env';
 import { createApp } from './app';
 import { logger } from './utils/logger';
-import { createDatabaseConnection } from './config/database';
+import { connectDatabase } from './config/database';
 
 loadEnv();
 
@@ -10,7 +10,7 @@ const HOST = process.env.HOST || '0.0.0.0';
 
 async function start() {
   try {
-    await createDatabaseConnection();
+    await connectDatabase();
     const app = createApp();
 
     app.listen(PORT, HOST, () => {

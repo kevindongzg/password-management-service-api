@@ -1,17 +1,17 @@
 # Project Structure, Environment & API
 
-## Project Structure
-- `src/app.ts` – Koa app setup, middleware, and decorator route init (`Route`).
-- `src/framework/decorator.ts` – decorators (`@controller`, `@get`...) and auto-scan.
-- `src/controllers/health.ts` – health controller using decorators.
-- `src/controllers/passwordReset.ts` – password reset controller (`/password-reset/initiate`, `/password-reset/execute`).
-- `src/index.ts` – server bootstrap and DB initialization.
-- `src/config/database.ts` – PostgreSQL pool configuration.
-- `src/__tests__/unit/health.test.ts` – unit test for health endpoint.
-- `src/__tests__/integration/health.http.e2e.test.ts` – E2E test hitting real app.
-- `Dockerfile` – production image build.
-- `docker-compose.yml` – local app + db.
-- `docker-compose.test.yml` – containerized test runner hitting real app.
+## Project Structure (folders)
+- `src/controllers/` – API controllers.
+- `src/services/` – business logic.
+- `src/repositories/` – database access.
+- `src/middleware/` – Koa middlewares.
+- `src/config/` – configuration and DB connection.
+- `src/utils/` – utilities (logger, validation, errors).
+- `src/framework/` – decorators and route loader.
+- `src/types/` – TypeScript types.
+- `src/__tests__/unit/` – unit tests.
+- `src/__tests__/integration/` – integration/E2E tests.
+- Root: `Dockerfile`, `docker-compose.yml`, `docker-compose.test.yml`.
 
 ## Environment Variables
 - Use `.env.local` for local development. The application loads env files in priority order: `.env.local` → `.env` → process environment.

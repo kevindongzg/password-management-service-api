@@ -6,6 +6,7 @@ This guide covers two ways to run the application locally, how to validate with 
 - Prerequisites: `Docker` and `docker-compose` installed.
 - Commands:
   - Build and start containers: `docker-compose build`, then `docker-compose up -d`
+  - [*Validate with Postman](#Validate-with-Postman)
   - Stop and clean up: `docker-compose down`
 - Behavior:
   - Once started, the app listens on `http://localhost:3000/api/v1`
@@ -20,6 +21,7 @@ This guide covers two ways to run the application locally, how to validate with 
   - Start the database with docker: `docker-compose up -d db`
   - Run DB migrations: `npm run migrate:up:local`
   - Start the service: `npm run local`
+  - [*Validate with Postman](#Validate-with-Postman)
 - Access after startup: `http://localhost:3000/api/v1`
 
 ## Validate with Postman

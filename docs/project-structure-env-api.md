@@ -57,7 +57,8 @@
       "error": "Invalid email",
       "status": 400,
       "timestamp": "2025-11-11T10:00:00.000Z",
-      "path": "/api/v1/password-reset/initiate"
+      "path": "/api/v1/password-reset/initiate",
+      "correlationId": "31fbac2a-846b-4673-a60a-f3170c28850e"
     }
     ```
 

@@ -19,7 +19,7 @@ export async function findUserByEmail(email: string): Promise<UserRow | null> {
 }
 
 export async function hasActiveReset(email: string): Promise<boolean> {
-  const rows = await sql<{ id: string }[]>`SELECT id FROM password_reset_requests WHERE email=${email} AND used_at IS NULL AND expires_at > NOW()`;
+  const rows = await sql`SELECT 1 FROM password_reset_requests WHERE email=${email} AND used_at IS NULL AND expires_at > NOW() LIMIT 1`;
   return rows.length > 0;
 }
 

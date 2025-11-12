@@ -6,13 +6,15 @@ import bcrypt from 'bcryptjs';
 import type { PasswordResetInitiateResponse, PasswordResetExecuteResponse } from '../types/passwordReset';
 
 const RESET_TTL_MINUTES = 30;
+const EMAIL_VALIDATION_OPTS = { allow_utf8_local_part: true, require_tld: true } as const;
+const BCRYPT_ROUNDS = parseInt(process.env.BCRYPT_ROUNDS || '12', 10);
 
 function generateCode(): string {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
 export async function initiatePasswordReset(email: string): Promise<PasswordResetInitiateResponse> {
-  if (!validator.isEmail(email, { allow_utf8_local_part: true, require_tld: true })) {
+  if (!validator.isEmail(email, EMAIL_VALIDATION_OPTS)) {
     const err: any = new Error('Invalid email');
     err.status = 400;
     throw err;
@@ -46,7 +48,7 @@ export async function executePasswordReset(
   code: string,
   newPassword: string
 ): Promise<PasswordResetExecuteResponse> {
-  if (!validator.isEmail(email, { allow_utf8_local_part: true, require_tld: true })) {
+  if (!validator.isEmail(email, EMAIL_VALIDATION_OPTS)) {
     const err: any = new Error('Invalid email');
     err.status = 400;
     throw err;
@@ -74,8 +76,7 @@ export async function executePasswordReset(
     throw err;
   }
 
-  const rounds = parseInt(process.env.BCRYPT_ROUNDS || '12', 10);
-  const hash = await bcrypt.hash(newPassword, rounds);
+  const hash = await bcrypt.hash(newPassword, BCRYPT_ROUNDS);
 
   await executeResetTransaction({ userId: req.user_id, hash, requestId: req.id });
 

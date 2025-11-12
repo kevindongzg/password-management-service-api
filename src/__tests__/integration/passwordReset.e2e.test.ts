@@ -14,7 +14,7 @@ describe('Password Reset E2E', () => {
 
   beforeAll(async () => {
     if (!dbUrl) {
-      throw new Error('DATABASE_URL not set for integration test seeding. Set env or run docker:test.');
+      throw new Error('DATABASE_URL not set for integration test seeding.');
     }
     client = new Client({ connectionString: dbUrl });
     await client.connect();

@@ -1,11 +1,11 @@
 import request from 'supertest';
 
-const baseUrl = process.env.TEST_BASE_URL || 'http://localhost:3000/api/v1';
+const baseUrl = process.env.TEST_BASE_URL || 'http://localhost:3000';
 
 describe('Correlation ID E2E', () => {
   it('returns x-correlation-id header and matches response body correlationId on error', async () => {
     const res = await request(baseUrl)
-      .post('/password-reset/initiate')
+      .post('/api/v1/password-reset/initiate')
       .set('x-correlation-id', 'e2e-corr-123')
       .send({ email: 'invalid' })
       .expect(400);

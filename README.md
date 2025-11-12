@@ -33,7 +33,7 @@ Build: `npm run build`
 - Unit tests: `npm run test:unit`
 - Integration tests:
   - Local env integration tests: `npm run test:integration` (__need service started with local or containers__)
-  - Containerized integration tests: `npm run docker:test`
+  - Containerized integration tests: `npm run docker:integration`
 
 ## DB migration
 - DB migration create: `npm run migrate:create <name>`

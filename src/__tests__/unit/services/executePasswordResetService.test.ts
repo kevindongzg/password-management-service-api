@@ -1,4 +1,4 @@
-import { executePasswordReset } from '../../services/passwordResetService';
+import { executePasswordReset } from '../../../services/passwordResetService';
 
 jest.mock('bcryptjs', () => ({
   __esModule: true,
@@ -7,12 +7,12 @@ jest.mock('bcryptjs', () => ({
   },
 }));
 
-jest.mock('../../repositories/passwordResetRepo', () => ({
+jest.mock('../../../repositories/passwordResetRepo', () => ({
   findResetRequest: jest.fn(),
   executeResetTransaction: jest.fn(),
 }));
 
-const repo = jest.requireMock('../../repositories/passwordResetRepo');
+const repo = jest.requireMock('../../../repositories/passwordResetRepo');
 
 describe('executePasswordReset', () => {
   beforeEach(() => {
@@ -28,6 +28,16 @@ describe('executePasswordReset', () => {
   it('rejects invalid password', async () => {
     await expect(executePasswordReset('user@example.com', '123456', 'short'))
       .rejects.toMatchObject({ status: 400 });
+  });
+
+  it('rejects invalid code (non-numeric)', async () => {
+    await expect(executePasswordReset('user@example.com', 'abc123', 'NewPass123!'))
+      .rejects.toMatchObject({ status: 404 });
+  });
+
+  it('rejects invalid code (wrong length)', async () => {
+    await expect(executePasswordReset('user@example.com', '12345', 'NewPass123!'))
+      .rejects.toMatchObject({ status: 404 });
   });
 
   it('rejects when request not found', async () => {

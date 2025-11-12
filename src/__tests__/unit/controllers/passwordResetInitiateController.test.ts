@@ -1,7 +1,7 @@
 import request from 'supertest';
-import { createApp } from '../../app';
+import { createApp } from '../../../app';
 
-jest.mock('../../services/passwordResetService', () => ({
+jest.mock('../../../services/passwordResetService', () => ({
   initiatePasswordReset: jest.fn().mockResolvedValue({
     resetId: 'test-reset-id',
     code: '123456',

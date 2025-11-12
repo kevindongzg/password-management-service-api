@@ -4,9 +4,9 @@ import {
   insertResetRequest,
   findResetRequest,
   executeResetTransaction,
-} from '../../repositories/passwordResetRepo';
+} from '../../../repositories/passwordResetRepo';
 
-jest.mock('../../config/sql', () => {
+jest.mock('../../../config/sql', () => {
   const sql: any = jest.fn();
   sql.begin = jest.fn(async (cb: any) => {
     const tx: any = jest.fn();
@@ -16,7 +16,7 @@ jest.mock('../../config/sql', () => {
   return { sql };
 });
 
-const { sql } = jest.requireMock('../../config/sql');
+const { sql } = jest.requireMock('../../../config/sql');
 
 describe('passwordResetRepo', () => {
   beforeEach(() => {

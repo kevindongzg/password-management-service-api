@@ -1,12 +1,12 @@
-import { initiatePasswordReset } from '../../services/passwordResetService';
+import { initiatePasswordReset } from '../../../services/passwordResetService';
 
-jest.mock('../../repositories/passwordResetRepo', () => ({
+jest.mock('../../../repositories/passwordResetRepo', () => ({
   findUserByEmail: jest.fn(),
   hasActiveReset: jest.fn(),
   insertResetRequest: jest.fn(),
 }));
 
-const repo = jest.requireMock('../../repositories/passwordResetRepo');
+const repo = jest.requireMock('../../../repositories/passwordResetRepo');
 
 describe('initiatePasswordReset', () => {
   beforeEach(() => {

@@ -1,6 +1,6 @@
 import Router from '@koa/router';
 import type Koa from 'koa';
-import type { Middleware, Context, Next } from 'koa';
+import type { Middleware } from 'koa';
 import { globSync } from 'glob';
 import { resolve } from 'path';
 
@@ -15,7 +15,7 @@ interface RouteConf {
 
 type ControllerCtor = Function;
 type Prototype = object;
-type ControllerMethod = (ctx: Context, next?: Next) => unknown;
+type ControllerMethod = Middleware<Koa.DefaultState, Koa.DefaultContext>;
 
 type RouterKey = RouteConf & { target: Prototype };
 
@@ -49,12 +49,12 @@ export const all = (path: string) => router({ method: 'all', path });
 export class Route {
   app: Koa;
   apiPath: string;
-  router: Router;
+  router: Router<Koa.DefaultState, Koa.DefaultContext>;
 
   constructor(app: Koa, apiPath: string, prefix = '/') {
     this.app = app;
     this.apiPath = apiPath;
-    this.router = new Router({ prefix });
+    this.router = new Router<Koa.DefaultState, Koa.DefaultContext>({ prefix });
   }
 
   init(): void {
@@ -63,15 +63,14 @@ export class Route {
     globSync(resolve(this.apiPath, `./**/*.{ts,js}`)).forEach((f: string) => require(f));
 
     for (const [conf, controller] of routerMap) {
-      const controllers = toArray<Middleware>(controller as unknown as Middleware);
+      const controllers = toArray<Middleware<Koa.DefaultState, Koa.DefaultContext>>(controller as Middleware<Koa.DefaultState, Koa.DefaultContext>);
       const rawPrefix = prefixRegistry.get(conf.target);
       const prefixPath = rawPrefix ? normalizePath(rawPrefix) : '';
       const routerPath = `${prefixPath}${conf.path}`;
       (this.router as any)[conf.method](routerPath, ...controllers);
     }
 
-    // Cast to satisfy Koa middleware typing differences between Router and Koa
-    this.app.use(this.router.routes() as unknown as Middleware);
-    this.app.use(this.router.allowedMethods() as unknown as Middleware);
+    this.app.use(this.router.routes());
+    this.app.use(this.router.allowedMethods());
   }
 }

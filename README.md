@@ -1,4 +1,5 @@
 # Password Management Service API
+Repository URL: https://github.com/kevindongzg/password-management-service-api
 
 ## Documents
 - [Local Run & Tests Guide](docs/local-run-and-tests.md)

@@ -12,11 +12,12 @@ const {
 
 export const sql = DATABASE_URL
   ? postgres(DATABASE_URL, { ssl: DB_SSL === 'true' })
-  : postgres({
-      host: DB_HOST,
-      port: DB_PORT ? parseInt(DB_PORT, 10) : 5432,
-      database: DB_NAME,
-      username: DB_USER,
-      password: DB_PASSWORD,
-      ssl: DB_SSL === 'true',
-    });
+  : (() => {
+      const opts: any = { ssl: DB_SSL === 'true' };
+      if (DB_HOST) opts.host = DB_HOST;
+      opts.port = DB_PORT ? parseInt(DB_PORT, 10) : 5432;
+      if (DB_NAME) opts.database = DB_NAME;
+      if (DB_USER) opts.username = DB_USER;
+      if (DB_PASSWORD) opts.password = DB_PASSWORD;
+      return postgres(opts);
+    })();

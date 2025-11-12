@@ -8,5 +8,6 @@ export type ApiErrorResponse = {
 
 export interface AppError extends Error {
   status?: number;
+  code?: string;
   details?: unknown;
 }

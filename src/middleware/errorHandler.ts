@@ -1,6 +1,6 @@
 import { Context, Next } from 'koa';
 import { logger } from '../utils/logger';
-import type { AppError } from '../types';
+import { isAppError } from '../utils/errors';
 
 export async function errorHandler(ctx: Context, next: Next) {
   try {
@@ -8,13 +8,16 @@ export async function errorHandler(ctx: Context, next: Next) {
   } catch (err: unknown) {
     let status = 500;
     let message = 'Internal Server Error';
+    let code: string | undefined;
 
-    if (typeof err === 'string') {
+    if (isAppError(err)) {
+      if (typeof err.status === 'number') status = err.status;
+      if (typeof err.message === 'string') message = err.message;
+      code = err.code;
+    } else if (typeof err === 'string') {
       message = err;
-    } else if (err && typeof err === 'object') {
-      const e = err as Partial<AppError> & { message?: unknown };
-      if (typeof e.status === 'number') status = e.status;
-      if (typeof e.message === 'string') message = e.message;
+    } else if (err instanceof Error) {
+      if (typeof err.message === 'string') message = err.message;
     }
 
     const errorInfo = err instanceof Error ? { name: err.name, stack: err.stack } : undefined;
@@ -22,6 +25,7 @@ export async function errorHandler(ctx: Context, next: Next) {
     logger.error('Request error', {
       status,
       message,
+      ...(code ? { code } : {}),
       method: ctx.method,
       url: ctx.url,
       correlation_id: ctx.state?.correlationId,

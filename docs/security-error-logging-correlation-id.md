@@ -9,14 +9,14 @@
 
 ## Error Handling
 - Application-level error middleware returns JSON:
-  - `{ "error": string, "status": number, "timestamp": ISOString, "path": string }`
+  - `{ "error": string, "status": number, "timestamp": ISOString, "path": string, "correlationId": string }`
 - Endpoint-level errors return concise messages with appropriate HTTP status codes.
 
 ## Logging
 - Structured logging with `winston`.
-- Access logs (http_access) include `method`, `path`, `status`, `duration_ms` and a timestamp.
-- Error logs include `status`, `message`, `method`, `url` and when available `name`, `stack`.
-- Business logs for reset endpoints record minimal identifiers (`email`) and do not include sensitive content (no passwords or full tokens).
+- Access logs (http_access) include `method`, `path`, `status`, `duration_ms`, `correlation_id` and a timestamp.
+- Error logs include `status`, `message`, `method`, `url`, `correlation_id` and when available `name`, `stack`.
+- Business logs for reset endpoints record minimal identifiers (`email`), `correlation_id` and do not include sensitive content (no passwords or full tokens).
 
 ## Correlation ID
 - Clients can provide `x-correlation-id` in the request header; if absent, the service generates a UUID and returns it in the response header `x-correlation-id`.

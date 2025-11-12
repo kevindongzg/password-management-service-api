@@ -10,7 +10,6 @@ const HOST = process.env.HOST || '0.0.0.0';
 
 async function start() {
   try {
-    // init db
     await createDatabaseConnection();
     const app = createApp();
 

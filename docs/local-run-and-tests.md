@@ -32,6 +32,9 @@ This guide covers two ways to run the application locally, how to validate with 
 - Validation flow:
   - Run “Initiate Password Reset”; confirm response contains `resetId`, `code`, `expiresAt`
   - Then run “Execute Password Reset”; the collection uses `{{code}}` and returns the success message
+- Check Postgresql DB data:
+  - Get Postgresql DB connection informations in [.env.local](../.env.local)
+  - DB table: `users` and `password_reset_requests`
 
 ## Run Tests
 - Unit tests: `npm run test:unit`

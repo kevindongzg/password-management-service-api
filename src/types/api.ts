@@ -3,6 +3,7 @@ export type ApiErrorResponse = {
   status: number;
   timestamp: string;
   path: string;
+  correlationId?: string;
 };
 
 export interface AppError extends Error {

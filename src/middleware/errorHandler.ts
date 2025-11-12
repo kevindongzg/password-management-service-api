@@ -24,6 +24,7 @@ export async function errorHandler(ctx: Context, next: Next) {
       message,
       method: ctx.method,
       url: ctx.url,
+      correlation_id: ctx.state?.correlationId,
       ...(errorInfo ?? {}),
     });
 
@@ -33,6 +34,7 @@ export async function errorHandler(ctx: Context, next: Next) {
       status,
       timestamp: new Date().toISOString(),
       path: ctx.path,
+      correlationId: ctx.state?.correlationId,
     };
   }
 }

@@ -91,7 +91,11 @@ Seed users (development/testing): a migration `migrations/*_seed-users.js` inser
       "service": "password-management-api"
     }
     ```
-- Business logs for reset endpoints record minimal identifiers（`email`）
+ - Business logs for reset endpoints record minimal identifiers (`email`) and do not include sensitive content (no passwords or full tokens).
+
+### Correlation ID
+- Clients can provide `x-correlation-id` in the request header; if absent, the service generates a UUID and returns it in the response header `x-correlation-id`.
+- The same ID appears as `correlation_id` in access and error logs to correlate events for the same request.
 
 ## Project Structure
 - `src/app.ts` – Koa app setup, middleware, and decorator route init (`Route`)

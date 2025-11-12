@@ -11,6 +11,7 @@ export async function accessLog(ctx: Context, next: Next) {
       method: ctx.method,
       path: ctx.path,
       status: ctx.status,
+      correlation_id: ctx.state?.correlationId,
       duration_ms,
     });
   }

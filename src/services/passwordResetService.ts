@@ -39,7 +39,7 @@ export async function initiatePasswordReset(email: string, correlationId?: strin
 export async function executePasswordReset(
   email: string,
   code: string,
-  newPassword: string,
+  newPassword?: string,
   correlationId?: string
 ): Promise<PasswordResetExecuteResponse> {
   if (!validator.isEmail(email, EMAIL_VALIDATION_OPTS)) {

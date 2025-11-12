@@ -9,7 +9,7 @@ export class PasswordResetController {
   async initiate(ctx: Context): Promise<void> {
     const body = (ctx.request.body ?? {}) as Partial<PasswordResetInitiateRequest>;
     const email: string = body.email ?? '';
-    const result: PasswordResetInitiateResponse = await initiatePasswordReset(email);
+    const result: PasswordResetInitiateResponse = await initiatePasswordReset(email, ctx.state?.correlationId);
     ctx.status = 200;
     ctx.body = result;
   }
@@ -20,7 +20,7 @@ export class PasswordResetController {
     const email: string = body.email ?? '';
     const code: string = body.code ?? '';
     const newPassword: string = body.newPassword ?? '';
-    const result: PasswordResetExecuteResponse = await executePasswordReset(email, code, newPassword);
+    const result: PasswordResetExecuteResponse = await executePasswordReset(email, code, newPassword, ctx.state?.correlationId);
     ctx.status = 200;
     ctx.body = result;
   }

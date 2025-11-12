@@ -13,7 +13,7 @@ function generateCode(): string {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-export async function initiatePasswordReset(email: string): Promise<PasswordResetInitiateResponse> {
+export async function initiatePasswordReset(email: string, correlationId?: string): Promise<PasswordResetInitiateResponse> {
   if (!validator.isEmail(email, EMAIL_VALIDATION_OPTS)) {
     const err: any = new Error('Invalid email');
     err.status = 400;
@@ -39,14 +39,15 @@ export async function initiatePasswordReset(email: string): Promise<PasswordRese
 
   await insertResetRequest({ id, userId: user.id, email, code, expiresAtIso: expiresAt.toISOString() });
 
-  logger.info('Password reset initiated', { email });
+  logger.info('Password reset initiated', { email, correlation_id: correlationId });
   return { resetId: id, code, expiresAt: expiresAt.toISOString() };
 }
 
 export async function executePasswordReset(
   email: string,
   code: string,
-  newPassword: string
+  newPassword: string,
+  correlationId?: string
 ): Promise<PasswordResetExecuteResponse> {
   if (!validator.isEmail(email, EMAIL_VALIDATION_OPTS)) {
     const err: any = new Error('Invalid email');
@@ -80,6 +81,6 @@ export async function executePasswordReset(
 
   await executeResetTransaction({ userId: req.user_id, hash, requestId: req.id });
 
-  logger.info('Password reset executed', { email });
+  logger.info('Password reset executed', { email, correlation_id: correlationId });
   return { message: 'Password updated successfully' };
 }

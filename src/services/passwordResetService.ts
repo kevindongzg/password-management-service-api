@@ -1,11 +1,10 @@
 import { findUserByEmail, hasActiveReset, insertResetRequest, findResetRequest, executeResetTransaction } from '../repositories/passwordResetRepo';
 import { logger } from '../utils/logger';
 import { v4 as uuidv4 } from 'uuid';
-import validator from 'validator';
 import bcrypt from 'bcryptjs';
 import type { PasswordResetInitiateResponse, PasswordResetExecuteResponse } from '../types';
 
-import { RESET_TTL_MINUTES, EMAIL_VALIDATION_OPTS, BCRYPT_ROUNDS } from '../config/constants';
+import { RESET_TTL_MINUTES, BCRYPT_ROUNDS } from '../config/constants';
 import { makeAppError } from '../utils/errors';
 
 function generateCode(): string {
@@ -13,9 +12,6 @@ function generateCode(): string {
 }
 
 export async function initiatePasswordReset(email: string, correlationId?: string): Promise<PasswordResetInitiateResponse> {
-  if (!validator.isEmail(email, EMAIL_VALIDATION_OPTS)) {
-    throw makeAppError('Invalid email', 400, 'INVALID_EMAIL');
-  }
   const user = await findUserByEmail(email);
   if (!user) {
     throw makeAppError('User not found', 404, 'USER_NOT_FOUND');
@@ -39,15 +35,9 @@ export async function initiatePasswordReset(email: string, correlationId?: strin
 export async function executePasswordReset(
   email: string,
   code: string,
-  newPassword?: string,
+  newPassword: string,
   correlationId?: string
 ): Promise<PasswordResetExecuteResponse> {
-  if (!validator.isEmail(email, EMAIL_VALIDATION_OPTS)) {
-    throw makeAppError('Invalid email', 400, 'INVALID_EMAIL');
-  }
-  if (!newPassword || newPassword.length < 8) {
-    throw makeAppError('Invalid password', 400, 'INVALID_PASSWORD');
-  }
 
   const req = await findResetRequest(email, code);
   if (!req) {

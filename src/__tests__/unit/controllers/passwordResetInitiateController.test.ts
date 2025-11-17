@@ -10,9 +10,10 @@ jest.mock('../../../services/passwordResetService', () => ({
 }));
 
 describe('PasswordResetController', () => {
+  const app = createApp();
+  const server = app.callback();
+  
   it('POST /api/v1/password-reset/initiate returns reset info', async () => {
-    const app = createApp();
-    const server = app.callback();
     const res = await request(server)
       .post('/api/v1/password-reset/initiate')
       .send({ email: 'user@example.com' });
@@ -22,5 +23,14 @@ describe('PasswordResetController', () => {
       resetId: 'test-reset-id',
       code: '123456',
     });
+  });
+
+  it('rejects invalid email with 400 and validation details', async () => {
+    const res = await request(server)
+      .post('/api/v1/password-reset/initiate')
+      .send({ email: 'invalid' });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty('error', 'Validation error');
   });
 });

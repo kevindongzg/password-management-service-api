@@ -15,11 +15,6 @@ describe('initiatePasswordReset', () => {
     repo.insertResetRequest.mockReset();
   });
 
-  it('rejects invalid email', async () => {
-    await expect(initiatePasswordReset('invalid'))
-      .rejects.toMatchObject({ status: 400 });
-  });
-
   it('rejects when user not found', async () => {
     repo.findUserByEmail.mockResolvedValueOnce(null);
 

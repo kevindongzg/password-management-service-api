@@ -20,16 +20,6 @@ describe('executePasswordReset', () => {
     repo.executeResetTransaction.mockReset();
   });
 
-  it('rejects invalid email', async () => {
-    await expect(executePasswordReset('invalid', '123456', 'NewPass123!'))
-      .rejects.toMatchObject({ status: 400 });
-  });
-
-  it('rejects invalid password', async () => {
-    await expect(executePasswordReset('user@example.com', '123456', 'short'))
-      .rejects.toMatchObject({ status: 400 });
-  });
-
   it('rejects invalid code (non-numeric)', async () => {
     await expect(executePasswordReset('user@example.com', 'abc123', 'NewPass123!'))
       .rejects.toMatchObject({ status: 404 });

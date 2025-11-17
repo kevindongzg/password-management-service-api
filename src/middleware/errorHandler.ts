@@ -1,6 +1,6 @@
 import { Context, Next } from 'koa';
 import { logger } from '../utils/logger';
-import { isAppError } from '../utils/errors';
+import { isHttpError } from '../utils/errors';
 
 export async function errorHandler(ctx: Context, next: Next) {
   try {
@@ -10,7 +10,7 @@ export async function errorHandler(ctx: Context, next: Next) {
     let message = 'Internal Server Error';
     let code: string | undefined;
 
-    if (isAppError(err)) {
+    if (isHttpError(err)) {
       if (typeof err.status === 'number') status = err.status;
       if (typeof err.message === 'string') message = err.message;
       code = err.code;
@@ -39,7 +39,7 @@ export async function errorHandler(ctx: Context, next: Next) {
       timestamp: new Date().toISOString(),
       path: ctx.path,
       correlationId: ctx.state?.correlationId,
-      ...(isAppError(err) && err.details !== undefined ? { details: err.details } : {}),
+      ...(isHttpError(err) && err.details !== undefined ? { details: err.details } : {}),
     };
   }
 }

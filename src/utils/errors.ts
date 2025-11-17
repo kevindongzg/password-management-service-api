@@ -1,13 +1,39 @@
-import type { AppError } from '../types';
-
-export function makeAppError(message: string, status: number, code?: string, details?: unknown): AppError {
-  const err = new Error(message) as AppError;
-  err.status = status;
-  if (code) err.code = code;
-  if (details !== undefined) err.details = details;
-  return err;
+export class HttpError extends Error {
+  status: number;
+  code?: string;
+  details?: unknown;
+  constructor(message: string, status: number, code?: string, details?: unknown) {
+    super(message);
+    this.status = status;
+    if (code) this.code = code;
+    if (details !== undefined) this.details = details;
+  }
 }
 
-export function isAppError(e: unknown): e is AppError {
-  return !!e && typeof e === 'object' && 'message' in (e as any);
+export class ValidationError extends HttpError {
+  constructor(details?: unknown) {
+    super('Validation error', 400, 'VALIDATION_ERROR', details);
+  }
+}
+
+export class NotFoundError extends HttpError {
+  constructor(message: string, code?: string, details?: unknown) {
+    super(message, 404, code, details);
+  }
+}
+
+export class BadRequestError extends HttpError {
+  constructor(message: string, code?: string, details?: unknown) {
+    super(message, 400, code, details);
+  }
+}
+
+export class TooManyRequestsError extends HttpError {
+  constructor(message: string, code?: string, details?: unknown) {
+    super(message, 429, code, details);
+  }
+}
+
+export function isHttpError(e: unknown): e is HttpError {
+  return e instanceof HttpError;
 }

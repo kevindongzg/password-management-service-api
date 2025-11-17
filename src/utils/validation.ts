@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { makeAppError } from './errors';
+import { ValidationError } from './errors';
 
 export const initiateSchema = z.object({
   email: z
@@ -26,7 +26,7 @@ export function parseOrThrow<T>(schema: z.ZodType<T>, body: object): T {
   const parsed = schema.safeParse(body);
   if (!parsed.success) {
     const details = parsed.error.issues.map(i => ({ path: i.path.join('.'), message: i.message }));
-    throw makeAppError('Validation error', 400, 'VALIDATION_ERROR', details);
+    throw new ValidationError(details);
   }
   return parsed.data as T;
 }

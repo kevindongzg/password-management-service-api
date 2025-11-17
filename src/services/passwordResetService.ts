@@ -5,7 +5,7 @@ import bcrypt from 'bcryptjs';
 import type { PasswordResetInitiateResponse, PasswordResetExecuteResponse } from '../types';
 
 import { RESET_TTL_MINUTES, BCRYPT_ROUNDS } from '../config/constants';
-import { makeAppError } from '../utils/errors';
+import { NotFoundError, TooManyRequestsError, BadRequestError } from '../utils/errors';
 
 function generateCode(): string {
   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -14,12 +14,12 @@ function generateCode(): string {
 export async function initiatePasswordReset(email: string, correlationId?: string): Promise<PasswordResetInitiateResponse> {
   const user = await findUserByEmail(email);
   if (!user) {
-    throw makeAppError('User not found', 404, 'USER_NOT_FOUND');
+    throw new NotFoundError('User not found', 'USER_NOT_FOUND');
   }
 
   const active = await hasActiveReset(email);
   if (active) {
-    throw makeAppError('An active reset request already exists', 429, 'ACTIVE_RESET_EXISTS');
+    throw new TooManyRequestsError('An active reset request already exists', 'ACTIVE_RESET_EXISTS');
   }
 
   const id = uuidv4();
@@ -41,13 +41,13 @@ export async function executePasswordReset(
 
   const req = await findResetRequest(email, code);
   if (!req) {
-    throw makeAppError('Reset request not found', 404, 'REQUEST_NOT_FOUND');
+    throw new NotFoundError('Reset request not found', 'REQUEST_NOT_FOUND');
   }
   if (req.used_at) {
-    throw makeAppError('Reset request already used', 400, 'REQUEST_ALREADY_USED');
+    throw new BadRequestError('Reset request already used', 'REQUEST_ALREADY_USED');
   }
   if (new Date(req.expires_at).getTime() < Date.now()) {
-    throw makeAppError('Reset request expired', 400, 'REQUEST_EXPIRED');
+    throw new BadRequestError('Reset request expired', 'REQUEST_EXPIRED');
   }
 
   const hash = await bcrypt.hash(newPassword, BCRYPT_ROUNDS);

@@ -1,6 +1,7 @@
 import { Context, Next } from 'koa';
 import { logger } from '../utils/logger';
 import { isHttpError } from '../utils/errors';
+import type { ErrorResponse } from '../types';
 
 export async function errorHandler(ctx: Context, next: Next) {
   try {
@@ -33,7 +34,7 @@ export async function errorHandler(ctx: Context, next: Next) {
     });
 
     ctx.status = status;
-    ctx.body = {
+    const response: ErrorResponse = {
       error: status < 500 ? message : 'Internal Server Error',
       status,
       timestamp: new Date().toISOString(),
@@ -41,5 +42,6 @@ export async function errorHandler(ctx: Context, next: Next) {
       correlationId: ctx.state?.correlationId,
       ...(isHttpError(err) && err.details !== undefined ? { details: err.details } : {}),
     };
+    ctx.body = response;
   }
 }

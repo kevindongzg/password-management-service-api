@@ -22,7 +22,7 @@ export const executeSchema = z.object({
     .min(8, 'Password too short'),
 });
 
-export function parseOrThrow<T>(schema: z.ZodType<T>, body: object): T {
+export function validateInput<T>(schema: z.ZodType<T>, body: object): T {
   const parsed = schema.safeParse(body);
   if (!parsed.success) {
     const details = parsed.error.issues.map(i => ({ path: i.path.join('.'), message: i.message }));

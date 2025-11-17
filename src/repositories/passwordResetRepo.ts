@@ -1,14 +1,17 @@
-import { sql } from '../config/sql';
 import type { UserRow, ResetRequestRow } from '../types';
+import { prisma } from '../config/prisma';
 
 export async function findUserByEmail(email: string): Promise<UserRow | null> {
-  const rows = await sql<UserRow[]>`SELECT id, email FROM users WHERE email=${email}`;
-  return rows[0] ?? null;
+  const user = await prisma.user.findUnique({ where: { email }, select: { id: true, email: true } });
+  return user ? { id: user.id, email: user.email } : null;
 }
 
 export async function hasActiveReset(email: string): Promise<boolean> {
-  const rows = await sql`SELECT 1 FROM password_reset_requests WHERE email=${email} AND used_at IS NULL AND expires_at > NOW() LIMIT 1`;
-  return rows.length > 0;
+  const found = await prisma.passwordResetRequest.findFirst({
+    where: { email, used_at: null, expires_at: { gt: new Date() } },
+    select: { id: true },
+  });
+  return !!found;
 }
 
 export async function insertResetRequest(params: {
@@ -19,12 +22,30 @@ export async function insertResetRequest(params: {
   expiresAtIso: string;
 }): Promise<void> {
   const { id, userId, email, code, expiresAtIso } = params;
-  await sql`INSERT INTO password_reset_requests (id, user_id, email, code, expires_at) VALUES (${id}, ${userId}, ${email}, ${code}, ${expiresAtIso})`;
+  await prisma.passwordResetRequest.create({
+    data: {
+      id,
+      userId,
+      email,
+      code,
+      expires_at: new Date(expiresAtIso),
+    },
+  });
 }
 
 export async function findResetRequest(email: string, code: string): Promise<ResetRequestRow | null> {
-  const rows = await sql<ResetRequestRow[]>`SELECT id, user_id, email, expires_at, used_at FROM password_reset_requests WHERE email=${email} AND code=${code}`;
-  return rows[0] ?? null;
+  const row = await prisma.passwordResetRequest.findFirst({
+    where: { email, code },
+    select: { id: true, userId: true, email: true, expires_at: true, used_at: true },
+  });
+  if (!row) return null;
+  return {
+    id: row.id,
+    user_id: row.userId,
+    email: row.email,
+    expires_at: row.expires_at.toISOString(),
+    used_at: row.used_at ? row.used_at.toISOString() : null,
+  };
 }
 
 export async function executeResetTransaction(params: {
@@ -33,8 +54,8 @@ export async function executeResetTransaction(params: {
   requestId: string;
 }): Promise<void> {
   const { userId, hash, requestId } = params;
-  await sql.begin(async (tx) => {
-    await tx`UPDATE users SET password_hash=${hash}, updated_at=NOW() WHERE id=${userId}`;
-    await tx`UPDATE password_reset_requests SET used_at=NOW() WHERE id=${requestId}`;
-  });
+  await prisma.$transaction([
+    prisma.user.update({ where: { id: userId }, data: { password_hash: hash, updated_at: new Date() } }),
+    prisma.passwordResetRequest.update({ where: { id: requestId }, data: { used_at: new Date() } }),
+  ]);
 }

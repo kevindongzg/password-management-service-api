@@ -1,11 +1,14 @@
 # ---- base ----
 FROM node:20-alpine AS base
 WORKDIR /app
+RUN apk add --no-cache openssl libstdc++
 
 # ---- deps ----
 FROM base AS deps
 COPY package.json package-lock.json ./
+COPY prisma ./prisma
 RUN npm ci --no-audit --no-fund
+RUN npx prisma generate
 
 # ---- build ----
 FROM deps AS build

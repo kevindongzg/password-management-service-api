@@ -7,28 +7,30 @@ jest.mock('../../../utils/logger', () => ({
   },
 }));
 
-jest.mock('../../../config/sql', () => ({
-  sql: jest.fn(async () => [{ now: new Date().toISOString() }]),
+jest.mock('../../../config/prisma', () => ({
+  prisma: {
+    $queryRaw: jest.fn(async () => [{ now: new Date().toISOString() }]),
+  },
 }));
 
-const { sql } = jest.requireMock('../../../config/sql');
+const { prisma } = jest.requireMock('../../../config/prisma');
 const { logger } = jest.requireMock('../../../utils/logger');
 
 describe('connectDatabase', () => {
   beforeEach(() => {
-    (sql as any).mockReset();
+    prisma.$queryRaw.mockReset();
     logger.info.mockReset();
     logger.error.mockReset();
   });
 
   it('logs success when connection works', async () => {
-    (sql as any).mockResolvedValueOnce([{ now: new Date().toISOString() }]);
+    prisma.$queryRaw.mockResolvedValueOnce([{ now: new Date().toISOString() }]);
     await connectDatabase();
     expect(logger.info).toHaveBeenCalledWith('Database connected');
   });
 
   it('logs error and throws when connection fails', async () => {
-    (sql as any).mockRejectedValueOnce(new Error('failed'));
+    prisma.$queryRaw.mockRejectedValueOnce(new Error('failed'));
     await expect(connectDatabase()).rejects.toBeTruthy();
     expect(logger.error).toHaveBeenCalled();
   });

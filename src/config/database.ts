@@ -1,9 +1,9 @@
 import { logger } from '../utils/logger';
-import { sql } from './sql';
+import { prisma } from './prisma';
 
 export async function connectDatabase(): Promise<void> {
   try {
-    await sql`SELECT NOW()`;
+    await prisma.$queryRaw`SELECT NOW()`;
     logger.info('Database connected');
   } catch (error) {
     logger.error('Database connection failed', { error });

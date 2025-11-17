@@ -23,8 +23,9 @@ Repository URL: https://github.com/kevindongzg/password-management-service-api
 - Decorator-based controllers auto-loaded from `src/controllers`
 - Password reset flow: Initiate + Execute endpoints with TTL and single-use
 
-## Running Locally
+## Running Locally (no Docker)
 1. Install dependencies: `npm install`
+2. Generate Prisma client: `npx prisma generate`
 2. Start DB (Docker): `docker-compose up -d db`
 3. DB migration up:`npm run migrate:up:local`
 4. Start service with local: `npm run local` (exposes `3000`)

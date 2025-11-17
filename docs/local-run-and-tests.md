@@ -6,7 +6,7 @@ This guide covers two ways to run the application locally, how to validate with 
 - Prerequisites: `Docker` and `docker-compose` installed.
 - Commands:
   - Build and start containers: `docker-compose build`, then `docker-compose up -d`
-  - [*Validate with Postman](#Validate-with-Postman)
+  - See: [Validate with Postman](#validate-with-postman)
   - Stop and clean up: `docker-compose down`
 - Behavior:
   - Once started, the app listens on `http://localhost:3000/api/v1`
@@ -18,10 +18,11 @@ This guide covers two ways to run the application locally, how to validate with 
   - Local PostgreSQL, or start only the DB with `docker-compose`
 - Recommended steps:
   - Install dependencies: `npm install`
-  - Start the database with docker: `docker-compose up -d db`
+  - Generate Prisma client: `npx prisma generate`
+  - Start the database Docker: `docker-compose up -d db`
   - Run DB migrations: `npm run migrate:up:local`
   - Start the service: `npm run local`
-  - [*Validate with Postman](#Validate-with-Postman)
+  - See: [Validate with Postman](#validate-with-postman)
 - Access after startup: `http://localhost:3000/api/v1`
 
 ## Validate with Postman

@@ -17,6 +17,8 @@
     "migrate:down": "node-pg-migrate down -m migrations",
     "migrate:up:local": "dotenv -e .env.local -- node-pg-migrate up -m migrations",
     "migrate:down:local": "dotenv -e .env.local -- node-pg-migrate down -m migrations",
+    "prisma:pull": "dotenv -e .env.local -- prisma db pull",
+    "prisma:generate": "prisma generate",
     "docker:build": "docker-compose build",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",

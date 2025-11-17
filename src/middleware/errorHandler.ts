@@ -39,6 +39,7 @@ export async function errorHandler(ctx: Context, next: Next) {
       timestamp: new Date().toISOString(),
       path: ctx.path,
       correlationId: ctx.state?.correlationId,
+      ...(isAppError(err) && err.details !== undefined ? { details: err.details } : {}),
     };
   }
 }

@@ -31,6 +31,16 @@ describe('PasswordResetController', () => {
       .send({ email: 'invalid' });
 
     expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty('error', 'Validation error');
+    expect(res.body.error).toBe('Validation error');
+    expect(res.body.details?.some((d: any) => d.path === 'email' && d.message === 'Invalid email')).toBe(true);
+  });
+
+  it('rejects missing email', async () => {
+    const res = await request(server)
+      .post('/api/v1/password-reset/initiate')
+      .send({});
+    expect(res.status).toBe(400);
+    expect(res.body.error).toBe('Validation error');
+    expect(res.body.details?.some((d: any) => d.path === 'email' && d.message === 'Missing email')).toBe(true);
   });
 });

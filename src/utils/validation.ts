@@ -1,30 +1,32 @@
 import { z } from 'zod';
-import { PasswordResetExecuteRequest, PasswordResetInitiateRequest } from '../types';
-
-export function normalizeString(value: string | null | undefined): string {
-  return (value ?? '').trim();
-}
+import { makeAppError } from './errors';
 
 export const initiateSchema = z.object({
-  email: z.string().email(),
+  email: z
+    .string({ required_error: 'Missing email' })
+    .transform(s => s.trim())
+    .pipe(z.string().email('Invalid email')),
 });
 
 export const executeSchema = z.object({
-  email: z.string().email(),
-  code: z.string().regex(/^\d{6}$/),
-  newPassword: z.string().min(8),
+  email: z
+    .string({ required_error: 'Missing email' })
+    .transform(s => s.trim())
+    .pipe(z.string().email('Invalid email')),
+  code: z
+    .string({ required_error: 'Missing code' })
+    .transform(s => s.trim())
+    .pipe(z.string().regex(/^\d{6}$/, 'Invalid code format')),
+  newPassword: z
+    .string({ required_error: 'Missing newPassword' })
+    .min(8, 'Password too short'),
 });
 
-export function validateInitiate(payload: Partial<PasswordResetInitiateRequest>) {
-  const normalized = { email: normalizeString(payload.email) };
-  return initiateSchema.safeParse(normalized);
-}
-
-export function validateExecute(payload: Partial<PasswordResetExecuteRequest>) {
-  const normalized = {
-    email: normalizeString(payload.email),
-    code: normalizeString(payload.code),
-    newPassword: payload.newPassword,
-  };
-  return executeSchema.safeParse(normalized);
+export function parseOrThrow<T>(schema: z.ZodType<T>, body: object): T {
+  const parsed = schema.safeParse(body);
+  if (!parsed.success) {
+    const details = parsed.error.issues.map(i => ({ path: i.path.join('.'), message: i.message }));
+    throw makeAppError('Validation error', 400, 'VALIDATION_ERROR', details);
+  }
+  return parsed.data as T;
 }
